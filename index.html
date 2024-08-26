@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Where in the world?</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="index.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="header">
+        <p>Where in the world?</p>
+        <div class="mode">
+          <img id="mode" class="svg" src="./images/moon.svg" alt="" />
+          <p>Dark Mode</p>
+        </div>
+      </div>
+    </header>
+    <nav>
+      <div class="flex-box">
+        <div class="search">
+          <img class="svg" src="./images/search-icon.svg" alt="" />
+          <input
+            type="text"
+            id="search-box"
+            placeholder="Search for a country…"
+          />
+        </div>
+        <div class="filter">
+          <label for="continent" class="visually-hidden"
+            >Filter by region</label
+          >
+          <div class="custom-select">
+            <div class="select-selected">
+              <p>Filter by region</p>
+              <span class="arrow">&#9662;</span>
+            </div>
+            <div class="select-items select-hide">
+              <div data-value="Africa">Africa</div>
+              <div data-value="Americas">Americas</div>
+              <div data-value="Asia">Asia</div>
+              <div data-value="Europe">Europe</div>
+              <div data-value="Oceania">Oceania</div>
+            </div>
+            <select id="continent" class="original-select" aria-hidden="true">
+              <option value="" disabled selected hidden>
+                Filter by region
+              </option>
+              <option value="Africa">Africa</option>
+              <option value="Americas">Americas</option>
+              <option value="Asia">Asia</option>
+              <option value="Europe">Europe</option>
+              <option value="Oceania">Oceania</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <main>
+      <div class="countries-container"></div>
+    </main>
+  </body>
+</html>
