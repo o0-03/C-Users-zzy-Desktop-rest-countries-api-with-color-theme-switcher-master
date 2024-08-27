@@ -157,18 +157,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // 黑暗模式
 document.addEventListener("DOMContentLoaded", () => {
-  const Mode = document.getElementById("mode");
-  Mode.addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
+  const modeButton = document.getElementById("mode");
+
+  if (sessionStorage.getItem("dark-mode") === "enabled") {
+    document.body.classList.add("dark-mode");
+  }
+
+  modeButton.addEventListener("click", () => {
+    if (document.body.classList.contains("dark-mode")) {
+      document.body.classList.remove("dark-mode");
+      sessionStorage.setItem("dark-mode", "disabled");
+    } else {
+      document.body.classList.add("dark-mode");
+      sessionStorage.setItem("dark-mode", "enabled");
+    }
   });
 });
 
 // 细节页面
-function getQueryParam(name) {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(name);
-}
-
 async function displayCountryDetails() {
   try {
     const countries = await loadCountries();
@@ -208,11 +214,34 @@ async function displayCountryDetails() {
               </div>
             </div>
             <div class="info-bottom">
-              <p><span>Border Countries:</span></p>
+              <span>Border Countries:</span>
+              <div class="border-countries">
+              ${
+                country.borders
+                  ? country.borders
+                      .map((code) => {
+                        const borderCountry = countries.find(
+                          (c) => c.alpha3Code === code
+                        );
+                        return `<p class="borderCountry" data-name="${
+                          borderCountry.name
+                        }">${borderCountry ? borderCountry.name : code}</p>`;
+                      })
+                      .join("")
+                  : "<span class='none-text' >none</span>"
+              }
+              </div>
             </div>
           </div>
         </div>
         `;
+        document.querySelectorAll(".borderCountry").forEach((borderCountry) => {
+          borderCountry.addEventListener("click", function () {
+            const countryName = borderCountry.getAttribute("data-name");
+            sessionStorage.setItem("selectedCountry", countryName);
+            window.location.href = "details.html";
+          });
+        });
       }
     }
   } catch (error) {

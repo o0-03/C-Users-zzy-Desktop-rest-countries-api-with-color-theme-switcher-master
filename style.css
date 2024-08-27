@@ -208,6 +208,27 @@ body {
   }
 }
 
+.info-bottom {
+  display: flex;
+  .border-countries {
+    display: flex;
+    flex-wrap: wrap;
+    .borderCountry {
+      height: 2rem;
+      line-height: 2rem;
+      border-radius: 0.3rem;
+      box-shadow: 0 0 0.3rem var(--color-shadow);
+      background-color: var(--color-background-light);
+      padding: 0 1rem;
+      margin: 0.3rem;
+      cursor: pointer;
+    }
+    .none-text {
+      font-weight: 300;
+      padding-left: 1rem;
+    }
+  }
+}
 @media (min-width: 768px) {
   .flex-box {
     display: flex;
