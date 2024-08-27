@@ -55,10 +55,13 @@ body {
     margin-right: 1rem;
   }
   #search-box {
+    width: 100%;
+    overflow: hidden;
     border: 0;
     outline: none;
     background-color: var(--color-background-light);
     color: var(--color-font-bold);
+    padding: 0 1rem;
     transition: all 0.2s;
   }
 }
@@ -96,9 +99,10 @@ body {
   box-shadow: 0 0 0.3rem var(--color-shadow);
   z-index: 99;
   width: 100%;
-  box-sizing: border-box;
 }
-
+.filter-text {
+  padding: 0 1rem;
+}
 /* gpt说为了确保表单提交时数据能被正确发送到服务器，避免了完全依赖自定义元素的潜在问题 
 我也不太懂 */
 .select-hide {

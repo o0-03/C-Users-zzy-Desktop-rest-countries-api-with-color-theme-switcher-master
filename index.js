@@ -1,25 +1,39 @@
+async function loadCountries() {
+  try {
+    const response = await fetch("data.json");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const countries = await response.json();
+    return countries;
+  } catch (error) {
+    console.error("Error loading JSON:", error);
+    return [];
+  }
+}
+
 function displayCountries(countries) {
   const container = document.getElementsByClassName("countries-container")[0];
+
   container.innerHTML = countries
     .map((country) => {
-      const population = country.population
-        ? country.population.toLocaleString()
-        : "N/A";
-      const area = country.area ? country.area.toLocaleString() : "N/A";
-
       return `
         <div class="country-box" data-country="${country.name}">
-          <img src="${country.flags.svg}">
+          <picture>
+            <source srcset="${country.flags.png}" type="image/svg+xml">
+            <img src="${country.flags.svg}" alt="${country.name} flag">
+          </picture>
           <div class="info">
             <h2>${country.name}</h2>
-            <p><span>Population:</span>${country.population}</p>
-            <p><span>Region:</span>${country.region}</p>
-            <p><span>Capital:</span>${country.capital}</p>
+            <p><span>Population:</span> ${country.population.toLocaleString()}</p>
+            <p><span>Region:</span> ${country.region}</p>
+            <p><span>Capital:</span> ${country.capital}</p>
           </div>
         </div>
       `;
     })
     .join("");
+  // 点击展示
   const countryBoxes = document.querySelectorAll(".country-box");
   countryBoxes.forEach((box) => {
     box.addEventListener("click", function () {
@@ -30,21 +44,14 @@ function displayCountries(countries) {
   });
 }
 
-async function loadCountries() {
-  try {
-    const response = await fetch("data.json");
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const countries = await response.json();
-    displayCountries(countries);
-  } catch (error) {
-    console.log("Error loading JSON:", error);
-  }
+async function init() {
+  const countries = await loadCountries();
+  displayCountries(countries);
 }
 
-loadCountries();
+init();
 
+// 筛选和搜索
 document.addEventListener("DOMContentLoaded", () => {
   const select = document.querySelector(".original-select");
   const selected = document.querySelector(".select-selected");
@@ -70,14 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
       select.value = this.getAttribute("data-value");
 
       const region = select.value;
-      countryList.innerHTML = "";
-
-      if (region) {
-        const filteredCountries = countries.filter(
-          (country) => country.region === region
-        );
-        displayCountries(filteredCountries);
-      }
+      searchAndDisplayCountries(region);
 
       items.classList.add("select-hide");
     });
@@ -88,16 +88,82 @@ document.addEventListener("DOMContentLoaded", () => {
       items.classList.add("select-hide");
     }
   });
+
+  let searchTimeout;
+
+  document
+    .getElementById("search-box")
+    .addEventListener("input", debounceSearch);
+  document
+    .getElementById("search-box")
+    .addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        searchAndDisplayCountries(select.value);
+      }
+    });
+
+  function debounceSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(
+      () => searchAndDisplayCountries(select.value),
+      500
+    );
+  }
+
+  function searchAndDisplayCountries(region) {
+    const query = document
+      .getElementById("search-box")
+      .value.trim()
+      .toLowerCase();
+
+    let filteredCountries = countries;
+
+    if (region) {
+      filteredCountries = filteredCountries.filter(
+        (country) => country.region === region
+      );
+    }
+
+    if (query) {
+      filteredCountries = filteredCountries
+        .filter((country) => country.name.toLowerCase().includes(query))
+        .sort((a, b) => {
+          const lowerNameA = a.name.toLowerCase();
+          const lowerNameB = b.name.toLowerCase();
+
+          const startsWithA = lowerNameA.startsWith(query);
+          const startsWithB = lowerNameB.startsWith(query);
+
+          if (startsWithA && !startsWithB) return -1;
+          if (!startsWithA && startsWithB) return 1;
+          return lowerNameA.localeCompare(lowerNameB);
+        }); //首字母匹配的优先展示
+    }
+
+    displayResults(filteredCountries);
+  }
+
+  function displayResults(results) {
+    const resultsContainer = document.getElementsByClassName(
+      "countries-container"
+    )[0];
+    if (results.length === 0) {
+      resultsContainer.innerHTML = "<p class='notFound'>No results found.</p>";
+    } else {
+      displayCountries(results);
+    }
+  }
 });
 
+// 黑暗模式
 document.addEventListener("DOMContentLoaded", () => {
   const Mode = document.getElementById("mode");
-  const Svgs = document.getElementsByClassName("svg");
   Mode.addEventListener("click", () => {
     document.body.classList.toggle("dark-mode");
   });
 });
 
+// 细节页面
 function getQueryParam(name) {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get(name);
@@ -105,11 +171,7 @@ function getQueryParam(name) {
 
 async function displayCountryDetails() {
   try {
-    const response = await fetch("data.json");
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const countries = await response.json();
+    const countries = await loadCountries();
     const countryName = sessionStorage.getItem("selectedCountry");
     if (countryName) {
       const country = countries.find(
@@ -119,7 +181,10 @@ async function displayCountryDetails() {
         const info = document.querySelector(".country-info");
         info.innerHTML = `
         <div class="details">
-          <img src="${country.flags.svg}" alt="${country.name} flag">
+          <picture>
+            <source srcset="${country.flags.png}" type="image/svg+xml">
+            <img src="${country.flags.svg}" alt="${country.name} flag">
+          </picture>
           <div class="text">
             <h2 class="info-title">${country.name}</h2>
             <div class="info-middle">
