@@ -25,8 +25,12 @@
 body {
   background-color: var(--color-background-heavy);
 }
-.header {
+header {
   position: sticky;
+  top: 0;
+  z-index: 99;
+}
+.header {
   background-color: var(--color-background-light);
   padding: 2rem 1rem;
   box-shadow: 0 0 0.5rem var(--color-shadow);
@@ -37,6 +41,7 @@ body {
   .mode {
     display: flex;
     align-items: center;
+    cursor: pointer;
     img {
       height: 20px;
     }
@@ -56,7 +61,6 @@ body {
   }
   #search-box {
     width: 100%;
-    overflow: hidden;
     border: 0;
     outline: none;
     background-color: var(--color-background-light);
@@ -93,11 +97,11 @@ body {
 
 .select-items {
   position: absolute;
-  top: 4rem;
+  bottom: -1rem;
+  transform: translateY(100%);
   background-color: var(--color-background-light);
   border-radius: 0.3rem;
   box-shadow: 0 0 0.3rem var(--color-shadow);
-  z-index: 99;
   width: 100%;
 }
 .filter-text {
@@ -121,25 +125,23 @@ body {
 .visually-hidden {
   position: absolute;
   overflow: hidden;
-
   border: 0;
 }
 
 .country-box {
   background-color: var(--color-background-light);
-  margin: 2rem auto;
-  width: 20rem;
   border-radius: 0.5rem;
   overflow: hidden;
   box-shadow: 0 0 0.5rem var(--color-shadow);
   transition: all 0.2s;
+  cursor: pointer;
   img {
-    width: 20rem;
+    width: 100%;
     aspect-ratio: 3/2;
     object-fit: cover;
   }
   .info {
-    padding: 1rem 0 2rem 1.5rem;
+    padding: 1.5rem;
     h2 {
       padding: 1rem 0;
       color: var(--color-font-bold);
@@ -190,14 +192,6 @@ body {
     margin-bottom: 2rem;
   }
   .text {
-    display: grid;
-    grid-template-rows: auto auto auto;
-    gap: 1rem;
-    .info-middle {
-      display: grid;
-      grid-template-rows: auto auto;
-      gap: 1rem;
-    }
     p {
       margin: 1rem 0;
       font-weight: 300;
@@ -251,9 +245,8 @@ body {
     .text {
       width: 100%;
       max-width: 40rem;
-      display: grid;
-      grid-template-rows: auto auto auto;
-      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
     }
   }
 }
@@ -276,7 +269,10 @@ body {
 
 .countries-container {
   display: grid;
-  @media (min-width: 768px) {
+  gap: 3rem 2rem;
+  place-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  /* @media (min-width: 768px) {
     grid-template-columns: 1fr 1fr;
   }
   @media (min-width: 1024px) {
@@ -284,5 +280,5 @@ body {
   }
   @media (min-width: 1400px) {
     grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
+  } */
 }

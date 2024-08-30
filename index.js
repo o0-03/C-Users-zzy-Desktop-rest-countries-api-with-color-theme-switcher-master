@@ -1,17 +1,18 @@
 async function loadCountries() {
-  try {
-    const response = await fetch("data.json");
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const countries = await response.json();
-    return countries;
-  } catch (error) {
-    console.error("Error loading JSON:", error);
-    return [];
-  }
+  return fetch("data.json")
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        console.error("HTTP error with status " + res.status);
+        return [];
+      }
+    })
+    .catch((error) => {
+      console.error(`HTTP error! ${error}`);
+      return [];
+    });
 }
-
 function displayCountries(countries) {
   const container = document.getElementsByClassName("countries-container")[0];
 
@@ -49,10 +50,9 @@ async function init() {
   displayCountries(countries);
 }
 
-init();
-
 // 筛选和搜索
 document.addEventListener("DOMContentLoaded", () => {
+  init();
   const select = document.querySelector(".original-select");
   const selected = document.querySelector(".select-selected");
   const items = document.querySelector(".select-items");
@@ -67,8 +67,13 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch((error) => console.error("Error loading the JSON file:", error));
 
-  selected.addEventListener("click", () => {
-    items.classList.toggle("select-hide");
+  // 修正：选择selected及其的下属都会触发点击事件
+  document.addEventListener("click", (e) => {
+    if (selected.contains(e.target)) {
+      items.classList.toggle("select-hide");
+    } else {
+      items.classList.add("select-hide");
+    }
   });
 
   items.querySelectorAll("div").forEach((item) => {
@@ -81,12 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       items.classList.add("select-hide");
     });
-  });
-
-  window.addEventListener("click", function (e) {
-    if (!e.target.matches(".select-selected")) {
-      items.classList.add("select-hide");
-    }
   });
 
   let searchTimeout;
@@ -157,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // 黑暗模式
 document.addEventListener("DOMContentLoaded", () => {
-  const modeButton = document.getElementById("mode");
+  const modeButton = document.getElementsByClassName("mode")[0];
 
   if (sessionStorage.getItem("dark-mode") === "enabled") {
     document.body.classList.add("dark-mode");
